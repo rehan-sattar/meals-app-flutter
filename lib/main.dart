@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './screens/category_meals_screen.dart';
 import './screens/categories_screen.dart';
+import './screens/meal_detail_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,6 +27,20 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         CategoryMealsScreen.routeName: (ctx) => CategoryMealsScreen(),
+        MealDetailScreen.routeName: (ctx) => MealDetailScreen(),
+      },
+
+      /// [onGenerateRoute] is not helpful in this case but in many casesz
+      /// we want to make a redirection based on arguments of routes. In such cases
+      /// it's really helpful!
+      /*
+      onGenerateRoute: (settings) {
+        print(settings.arguments);
+        return MaterialPageRoute(builder: (ctx) => CategoryMealsScreen());
+      },
+      */
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(builder: (ctx) => CategoryMealsScreen());
       },
       home: CategoriesScreen(),
     );
