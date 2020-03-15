@@ -4,10 +4,48 @@ import './screens/filters_screen.dart';
 import './screens/tabs_screen.dart';
 import './screens/category_meals_screen.dart';
 import './screens/meal_detail_screen.dart';
+import './models/filter.dart';
+import './models/meals.dart';
+import './dummy-data.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  FilterData _filterData = new FilterData(
+    glutenFree: false,
+    isVegan: false,
+    lactosFree: false,
+    vegitarian: false,
+  );
+
+  List<Meal> _availableMeals = DUMMY_MEALS;
+
+  void _setFilters(FilterData newFilterData) {
+    setState(() {
+      _filterData = newFilterData;
+      _availableMeals = DUMMY_MEALS.where((meal) {
+        if (_filterData.vegitarian && !meal.isVegetarian) {
+          return false;
+        }
+        if (_filterData.lactosFree && !meal.isLactoseFree) {
+          return false;
+        }
+        if (_filterData.glutenFree && !meal.isGlutenFree) {
+          return false;
+        }
+        if (_filterData.isVegan && !meal.isVegan) {
+          return false;
+        }
+        return true;
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,9 +67,11 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/': (ctx) => TabsScreen(),
-        CategoryMealsScreen.routeName: (ctx) => CategoryMealsScreen(),
+        CategoryMealsScreen.routeName: (ctx) =>
+            CategoryMealsScreen(_availableMeals),
         MealDetailScreen.routeName: (ctx) => MealDetailScreen(),
-        FiltersScreen.routeName: (ctx) => FiltersScreen()
+        FiltersScreen.routeName: (ctx) =>
+            FiltersScreen(_filterData, _setFilters)
       },
 
       /// [onGenerateRoute] is not helpful in this case but in many casesz
@@ -44,7 +84,8 @@ class MyApp extends StatelessWidget {
       },
       */
       onUnknownRoute: (settings) {
-        return MaterialPageRoute(builder: (ctx) => CategoryMealsScreen());
+        return MaterialPageRoute(
+            builder: (ctx) => CategoryMealsScreen(_availableMeals));
       },
       // home: CategoriesScreen(),
     );
